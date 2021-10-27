@@ -32,9 +32,9 @@ order_schema = StructType([
 ])
 
 # Чтение входных данных
-df_customers = spark.read.option("sep", "\t").schema(customer_schema).csv('customer.csv ')
-df_products = spark.read.option("sep", "\t").schema(product_schema).csv('product.csv ')
-df_orders = spark.read.option("sep", "\t").schema(order_schema).csv('order.csv ')
+df_customers = spark.read.option("sep", "\t").schema(customer_schema).csv('customer.csv')
+df_products = spark.read.option("sep", "\t").schema(product_schema).csv('product.csv')
+df_orders = spark.read.option("sep", "\t").schema(order_schema).csv('order.csv')
 
 df_customers.show()
 df_products.show()
@@ -49,7 +49,7 @@ df_products.createOrReplaceTempView('df_products')
 query = """
 SELECT customer_name, product_name
 FROM ( SELECT c.name as customer_name, p.name as product_name, SUM(o.numberOfProduct), 
-       ROW_NUMBER() OVER (PARTITION BY c.name ORDER BY SUM(o.numberOfProduct) DESC) as r_n
+       RANK() OVER (PARTITION BY c.name ORDER BY SUM(o.numberOfProduct) DESC) as r_n
        FROM df_orders o
        JOIN df_products p ON o.productID = p.id 
        JOIN df_customers c ON c.id = o.customerID
